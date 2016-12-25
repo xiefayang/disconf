@@ -97,7 +97,15 @@ public final class DisClientConfig {
     public static final String APP_NAME = "disconf.app";
     @DisInnerConfigAnnotation(name = DisClientConfig.APP_NAME)
     public String APP;
-
+    /**
+     * 机器节点名称
+     *
+     * @author
+     * @since 1.0.0
+     */
+    public static final String NODE_NAME = "disconf.node";
+    @DisInnerConfigAnnotation(name = DisClientConfig.NODE_NAME)
+    public String NODE;
     /**
      * 版本
      *
