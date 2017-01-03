@@ -77,10 +77,9 @@ public class DisconfItemCoreProcessorImpl implements DisconfCoreProcessor {
      * 更新 一个配置
      */
     private void updateOneConf(String keyName) throws Exception {
-
+    	keyName=NodeUtils.getComKey(keyName);
         DisconfCenterItem disconfCenterItem = (DisconfCenterItem) disconfStoreProcessor.getConfData(keyName);
         if (disconfCenterItem != null) {
-
             // 更新仓库
             updateOneConfItem(keyName, disconfCenterItem);
 
@@ -99,31 +98,50 @@ public class DisconfItemCoreProcessorImpl implements DisconfCoreProcessor {
         }
 
         String value = null;
-
+        boolean ifOwn=false;
+        String comKey=NodeUtils.getComKey(keyName);
+        String ownKey=NodeUtils.getOwnKey(keyName);
         //
         // 开启disconf才需要远程下载, 否则就用默认值
         //
         if (DisClientConfig.getInstance().ENABLE_DISCONF) {
             //
-            // 下载配置
+            // 下载个性化配置
             //
             try {
                 String url = disconfCenterItem.getRemoteServerUrl();
-                value = fetcherMgr.getValueFromServer(url);
+                String tempUrl=NodeUtils.getNodeUrl(url);
+                value = fetcherMgr.getValueFromServer(tempUrl);
                 if (value != null) {
+                	ifOwn=true;
                     LOGGER.debug("value: " + value);
                 }
+                LOGGER.debug("download ok.");
             } catch (Exception e) {
                 LOGGER.error("cannot use remote configuration: " + keyName, e);
                 LOGGER.info("using local variable: " + keyName);
             }
-            LOGGER.debug("download ok.");
+            //
+            // 下载配置
+            //
+            try {
+				if (value == null) {
+					String url = disconfCenterItem.getRemoteServerUrl();
+					value = fetcherMgr.getValueFromServer(url);
+					if (value != null) {
+						LOGGER.debug("value: " + value);
+					}
+					LOGGER.debug("download ok.");
+				}
+            } catch (Exception e) {
+                LOGGER.error("cannot use remote configuration: " + keyName, e);
+                LOGGER.info("using local variable: " + keyName);
+            }
         }
-
         //
         // 注入到仓库中
         //
-        disconfStoreProcessor.inject2Store(keyName, new DisconfValue(value, null));
+        disconfStoreProcessor.inject2Store(comKey, new DisconfValue(value, null));
         LOGGER.debug("inject ok.");
 
         //
@@ -131,7 +149,12 @@ public class DisconfItemCoreProcessorImpl implements DisconfCoreProcessor {
         //
         if (DisClientConfig.getInstance().ENABLE_DISCONF) {
             if (watchMgr != null) {
-                DisConfCommonModel disConfCommonModel = disconfStoreProcessor.getCommonModel(keyName);
+            	if(ifOwn){
+            		keyName=ownKey;
+            	}else{
+            		keyName=comKey;
+            	}
+                DisConfCommonModel disConfCommonModel = disconfStoreProcessor.getCommonModel(comKey);
                 watchMgr.watchPath(this, disConfCommonModel, keyName, DisConfigTypeEnum.ITEM, value);
                 LOGGER.debug("watch ok.");
             } else {
@@ -145,7 +168,7 @@ public class DisconfItemCoreProcessorImpl implements DisconfCoreProcessor {
      */
     @Override
     public void updateOneConfAndCallback(String key) throws Exception {
-
+    	key=NodeUtils.getComKey(key);
         // 更新 配置
         updateOneConf(key);
 

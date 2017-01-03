@@ -180,9 +180,7 @@
                 </includes>
             </resource>
         </resources>
-
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -197,18 +195,6 @@
                         <verbose/>
                         <bootclasspath>${java.home}/lib/rt.jar</bootclasspath>
                     </compilerArguments>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>*.properties</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>conf/**</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

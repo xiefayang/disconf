@@ -376,6 +376,9 @@ public class ReloadingPropertyPlaceholderConfigurer extends DefaultPropertyPlace
             // .unicon.iamlabs.spring.properties file locations.
             if (!(beanNames[i].equals(this.beanName) && beanFactoryToProcess.equals(this.beanFactory))) {
                 this.currentBeanName = beanNames[i];
+                if(this.currentBeanName.contains("springServlet")){
+                	System.out.println("测试……");
+                }
                 try {
                     BeanDefinition bd = beanFactoryToProcess.getBeanDefinition(beanNames[i]);
                     try {

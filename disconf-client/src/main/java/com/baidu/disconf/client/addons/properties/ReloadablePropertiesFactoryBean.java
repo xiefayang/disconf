@@ -3,8 +3,11 @@ package com.baidu.disconf.client.addons.properties;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -18,6 +21,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.baidu.disconf.client.DisconfMgr;
+import com.baidu.disconf.client.config.DisClientConfig;
 
 /**
  * A properties factory bean that creates a reconfigurable Properties object.
@@ -225,7 +229,25 @@ public class ReloadablePropertiesFactoryBean extends PropertiesFactoryBean imple
      * @throws IOException
      */
     private void doReload() throws IOException {
-        reloadableProperties.setProperties(mergeProperties());
+    	Properties properties=mergeProperties();
+        //取自己机器的节点
+        String node=DisClientConfig.getInstance().NODE;
+        if(null!=node&&!"".equals(node)){
+	        Map<Object,Object> rtnMap=new HashMap<Object,Object>();
+	        Map<Object,Object> highMap=new HashMap<Object,Object>();
+	        for(Entry<Object, Object> entry:properties.entrySet()){
+	        	//自己机器的配置优先
+	        	if(entry.getKey().toString().endsWith("."+node)){
+	        		highMap.put(entry.getKey().toString().replace("."+node, ""), entry.getValue());
+	        	}else{
+	        		rtnMap.put(entry.getKey(), entry.getValue());
+	        	}
+	        }
+	        //将自己的覆盖公用的……
+	        rtnMap.putAll(highMap);
+	        properties.putAll(rtnMap);
+        }
+        reloadableProperties.setProperties(properties);
     }
 
     /**

@@ -128,24 +128,10 @@ public class DisconfFileCoreProcessorImpl implements DisconfCoreProcessor {
         } catch (Exception e) {
             LOGGER.error("cannot get kv data for " + filePath, e);
         }
-        //取自己机器的节点
-        String node=DisClientConfig.getInstance().NODE;;
-        Map<String,Object> rtnMap=new HashMap<String,Object>();
-        Map<String,Object> highMap=new HashMap<String,Object>();
-        for(Entry<String, Object> entry:dataMap.entrySet()){
-        	//自己机器的配置优先
-        	if(entry.getKey().endsWith("."+node)){
-        		highMap.put(entry.getKey().replace("."+node, ""), entry.getValue());
-        	}else{
-        		rtnMap.put(entry.getKey(), entry.getValue());
-        	}
-        }
-        //将自己的覆盖公用的……
-        rtnMap.putAll(highMap);
         //
         // 注入到仓库中
         //
-        disconfStoreProcessor.inject2Store(fileName, new DisconfValue(null, rtnMap));
+        disconfStoreProcessor.inject2Store(fileName, new DisconfValue(null, dataMap));
         LOGGER.debug("inject ok.");
 
         //

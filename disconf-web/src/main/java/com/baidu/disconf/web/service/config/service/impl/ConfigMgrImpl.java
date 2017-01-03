@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
@@ -440,7 +441,15 @@ public class ConfigMgrImpl implements ConfigMgr {
 
                     } else {
                         if (!zkDataStr.equals(valueInDb.toString().trim())) {
-                            isEqual = false;
+                        	isEqual = false;
+                        	for(Entry<Object,Object> entry:prop.entrySet()){
+                        		//说明含有个性化key
+                        		if(entry.getKey().toString().startsWith(keyInZk)){
+                        			if(entry.getValue().toString().equals(zkDataStr)){
+                        				isEqual = true;
+                        			}
+                        		}
+                        	};
                         }
                     }
 
