@@ -23,7 +23,7 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-			<id>public</id>
+			<id>test</id>
 			<name>Public Repositories</name>
 			<url>http://202.105.139.120:8081/artifactory/repo</url>
 		</repository>
